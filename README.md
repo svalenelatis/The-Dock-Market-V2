@@ -90,11 +90,14 @@ Dock Market is built with the intent of being self-hosted via free online hostin
 **Backend** (`.env`):
 - `SUPABASE_URL` — Your Supabase project URL
 - `SUPABASE_SERVICE_ROLE_KEY` — Service role key (server-side only)
+- `SUPABASE_ANON_KEY` - Generated anon key
 - `PORT` — Server port (default 3000)
+- `FRONTEND_URL` - Frontend URL pointer
 
 **Frontend** (`.env`):
 - `VITE_SUPABASE_URL` — Your Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` — Supabase anon/public key
+- `VITE_API_URL` - Backend URL, Railway if hosted on Railway
 
 ## Development
 
