@@ -327,7 +327,10 @@ router.post('/', async (req, res) => {
 
     const now = new Date()
     const scheduledDate = new Date(now)
-    scheduledDate.setDate(scheduledDate.getDate() + travelDays)
+    // TODO: PLAYTEST OVERRIDE — set travelDays to 0 so transactions resolve immediately.
+    // Revert this by removing the next line to restore real travel times.
+    const playtestTravelDays = 0
+    scheduledDate.setDate(scheduledDate.getDate() + playtestTravelDays)
     // Use local date to stay consistent with the daily handler's date comparison
     const scheduledDateStr = `${scheduledDate.getFullYear()}-${String(scheduledDate.getMonth() + 1).padStart(2, '0')}-${String(scheduledDate.getDate()).padStart(2, '0')}`
 

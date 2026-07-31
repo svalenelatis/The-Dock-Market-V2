@@ -560,8 +560,11 @@ async function buildReturnTrips(transactions, shipMap, playerMap) {
     const distance = Math.sqrt(Math.pow(home.x - target.x, 2) + Math.pow(home.y - target.y, 2))
     const travelDays = Math.max(1, Math.ceil(distance / ship.speed))
 
+    // TODO: PLAYTEST OVERRIDE — return trips resolve immediately.
+    // Revert by removing the next line to restore real travel times.
+    const playtestTravelDays = 0
     const returnDate = new Date()
-    returnDate.setDate(returnDate.getDate() + travelDays)
+    returnDate.setDate(returnDate.getDate() + playtestTravelDays)
     // Use local date to stay consistent with the daily handler's date comparison
     const returnDateStr = `${returnDate.getFullYear()}-${String(returnDate.getMonth() + 1).padStart(2, '0')}-${String(returnDate.getDate()).padStart(2, '0')}`
 
