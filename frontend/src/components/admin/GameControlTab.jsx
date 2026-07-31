@@ -317,6 +317,7 @@ function ShipCreationForm({ token, playerId }) {
  * Factory creation form with type, input requirements, and output production fields.
  * Validates: type (1-100 chars), inputs (array of item_name + quantity 1-10,000),
  * output (item_name + quantity 1-10,000).
+ * Item name fields are dropdowns populated from the items API + "Gold".
  */
 function FactoryCreationForm({ token, playerId }) {
   const [type, setType] = useState('')
@@ -327,6 +328,25 @@ function FactoryCreationForm({ token, playerId }) {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(null)
   const [apiError, setApiError] = useState(null)
+  const [itemOptions, setItemOptions] = useState([])
+
+  // Fetch available items for dropdowns
+  useEffect(() => {
+    async function fetchItems() {
+      try {
+        const data = await apiCall('/api/admin/items', { token })
+        const names = (data || [])
+          .filter((item) => item.active !== false)
+          .map((item) => item.name)
+          .sort()
+        setItemOptions(['Gold', ...names])
+      } catch {
+        // Fallback — at minimum allow Gold
+        setItemOptions(['Gold'])
+      }
+    }
+    fetchItems()
+  }, [token])
 
   function validate() {
     const newErrors = {}
@@ -464,14 +484,17 @@ function FactoryCreationForm({ token, playerId }) {
             {inputs.map((input, idx) => (
               <div key={idx} className="flex gap-2 items-start">
                 <div className="flex-1">
-                  <input
-                    type="text"
+                  <select
                     value={input.item_name}
                     onChange={(e) => updateInput(idx, 'item_name', e.target.value)}
-                    placeholder="Item name"
                     className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     aria-label={`Input item ${idx + 1} name`}
-                  />
+                  >
+                    <option value="">Select item...</option>
+                    {itemOptions.map((name) => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
                   <InlineValidationError error={errors.inputs?.[idx]?.item_name} />
                 </div>
                 <div className="w-24">
@@ -506,14 +529,17 @@ function FactoryCreationForm({ token, playerId }) {
           <label className="block text-sm text-gray-600 mb-1">Output Production</label>
           <div className="flex gap-2">
             <div className="flex-1">
-              <input
-                type="text"
+              <select
                 value={outputItemName}
                 onChange={(e) => setOutputItemName(e.target.value)}
-                placeholder="Output item name"
                 className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="Output item name"
-              />
+              >
+                <option value="">Select item...</option>
+                {itemOptions.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
               <InlineValidationError error={errors.output_item_name} />
             </div>
             <div className="w-24">
