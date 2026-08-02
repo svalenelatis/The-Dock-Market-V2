@@ -54,8 +54,17 @@ async function loadSchedules() {
 
     for (const row of data) {
       const jobName = row.key.replace('cron_', '') // e.g. "transactions"
-      // value is JSONB — could be a quoted string like "0 * * * *" or a raw string
-      const schedule = typeof row.value === 'string' ? row.value : String(row.value)
+      // value is JSONB — Supabase client auto-deserializes JSON strings,
+      // but handle edge cases (extra quotes, objects, etc.)
+      let schedule = row.value
+      if (typeof schedule !== 'string') {
+        schedule = String(schedule)
+      }
+      // Strip any wrapping quotes that might sneak in from JSONB storage
+      schedule = schedule.replace(/^["']|["']$/g, '').trim()
+
+      log.info({ jobName, rawValue: row.value, parsedSchedule: schedule }, `Loading cron config for "${jobName}"`)
+
       const runner = runners[jobName]
 
       if (!runner) {
