@@ -38,6 +38,12 @@ function setupGracefulShutdown(logger) {
   const handleSignal = (signal) => {
     lifecycleLogger.info({ signal }, `Received ${signal}, shutting down gracefully`);
 
+    // Stop cron scheduler
+    try {
+      const { stopAll } = require('./scheduler');
+      stopAll();
+    } catch { /* scheduler may not be loaded */ }
+
     const timeout = setTimeout(() => {
       process.exit(1);
     }, 5000);

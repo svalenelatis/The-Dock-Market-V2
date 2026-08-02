@@ -3,11 +3,35 @@ const adminAuth = require('../../middleware/admin')
 const supabase = require('../../lib/supabase')
 const { validateConfiguration, validateConfigKey } = require('../../utils/admin-validators')
 const { buildAuditRecord } = require('../../utils/audit')
+const { reloadSchedules, getStatus } = require('../../lib/scheduler')
 
 const router = Router()
 
 // All admin configuration routes require authentication + admin role
 router.use(adminAuth)
+
+// POST /reload-schedules — Reload cron schedules from DB without restart
+router.post('/reload-schedules', async (req, res) => {
+  try {
+    req.log.info({ module: 'admin', operation: 'reloadSchedules' }, 'Reloading cron schedules')
+    await reloadSchedules()
+    const status = getStatus()
+    return res.status(200).json({ message: 'Schedules reloaded', jobs: status })
+  } catch (err) {
+    req.log.error({ module: 'admin', operation: 'reloadSchedules', err }, 'Failed to reload schedules')
+    return res.status(500).json({ error: 'Failed to reload schedules' })
+  }
+})
+
+// GET /schedules — Get current scheduler status
+router.get('/schedules', async (req, res) => {
+  try {
+    const status = getStatus()
+    return res.status(200).json(status)
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to get schedule status' })
+  }
+})
 
 // GET / — List all configuration entries
 router.get('/', async (req, res) => {

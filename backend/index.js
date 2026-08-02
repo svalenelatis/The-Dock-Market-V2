@@ -116,6 +116,10 @@ app.use(errorHandler)
 if (require.main === module) {
   app.listen(port, () => {
     logStartup(port)
+
+    // Start the in-process cron scheduler
+    const { loadSchedules } = require('./lib/scheduler')
+    loadSchedules()
   })
   setupGracefulShutdown(logger)
 }

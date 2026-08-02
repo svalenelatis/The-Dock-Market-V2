@@ -110,6 +110,9 @@ router.post('/factories', async (req, res) => {
 })
 
 module.exports = router
+module.exports.runMarketUpdate = runMarketUpdate
+module.exports.runTransactionProcessing = runTransactionProcessing
+module.exports.runFactoryProcessing = runFactoryProcessing
 
 
 // ============================================================
